@@ -1,0 +1,12 @@
+For testing alignment
+1. Need to turn old system of pbd's into a pharmscreen ready file (activity files need to match)
+2. Need to run alignment program
+3. Need to run pharmscreen
+4. need to remove non-functional parts of the data sets
+5. need to create 4 directories - CoMFA, 0.1, 0.01, 0.001
+6. need to run each of the 4 directories with QSAR
+
+
+Overall goals
+- Need to have one source for the codes, need to be able to call them into other folders
+- Need to break codes up into parts and have each callable by a central code
