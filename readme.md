@@ -12,6 +12,12 @@ While this is not the most elegant set of code it was cobbled together based on 
 
 Unfortunately since the code requires use of Pharmacelera's Programs it will not be runnable by most people (aside from those who subscribe to their product). This is more of an education process detailing how it would be done.
 
+### Overview of Parts
+
+There are 2 section of this project that I have submited
+* The first is 0.SourceFiles that provides the molecular datasets that had been collected and made by Dr. Sutherland and his team.
+* The second file called PharmaceleraTools has my actual code in it. The entire rest of the Readme will discuss the scripts found in there. 
+
 
 ### Prerequisites
 
