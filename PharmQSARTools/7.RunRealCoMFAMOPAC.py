@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Merge files into a PharmaScreen ready file
+# Part 7 - Running CoMFA, MOPAC for 0.1, 0.01, 0.001
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 # Libraries needed
@@ -13,6 +13,13 @@ def copyFiles(dataSet):
     #---------------------------- Load in Libraries ----------------------------
     #---------------------------------------------------------------------------
     from os import rename, listdir, remove, path, getcwd, remove, chdir, makedirs
+    #---------------------------------------------------------------------------
+    #----------------------- Description of Function ---------------------------
+    #---------------------------------------------------------------------------
+    '''
+    Lolz, this is such a simple part of the program. Anyway it just duplicates
+    the thing that we calculated in the last part 3 times into new folders
+    '''
     #---------------------------------------------------------------------------
     #--------------------------- Create part 8 ---------------------------------
     #---------------------------------------------------------------------------
@@ -37,12 +44,24 @@ def copyFiles(dataSet):
     if path.isdir(dataSet + "0.001") != True:
         copy_tree(("./../6.QSAR/" + dataSet), ("./" + dataSet + "/" + dataSet + "-0.001"))
 
-def CoMFA(dataSet):
+
+def QSAR(dataSet):
     #---------------------------------------------------------------------------
     #---------------------------- Load in Libraries ----------------------------
     #---------------------------------------------------------------------------
     import subprocess
     from os import rename, listdir, remove, path, getcwd, remove, chdir, makedirs
+    #---------------------------------------------------------------------------
+    #----------------------- Description of Function ---------------------------
+    #---------------------------------------------------------------------------
+    '''
+    So this is one of the key parts of the program, it actually runs CoMFA, Mopac
+    on the files
+
+    As you can see, it just cycles through each part and preforms the
+    calculations before continuing, not really too complex.
+
+    '''
     #---------------------------------------------------------------------------
     #---------------------------- Loading data ---------------------------------
     #---------------------------------------------------------------------------
@@ -52,7 +71,7 @@ def CoMFA(dataSet):
 
 
     for stdError in stdErrors:
-        directoryName = "./" +dataSet + "-" + stdError
+        directoryName = "./" + dataSet + "-" + stdError
         chdir(directoryName)
 
         print "--------------------------------------------------------"
@@ -62,22 +81,19 @@ def CoMFA(dataSet):
         #---------------------------------------------------------------------------
         # CoMFA with set stdError
         #---------------------------------------------------------------------------
-        bashCommand = "./pharmqsar --mode pls -x CoMFA --sdthr " + stdError + " --norm 1 --plscfg pharmqsar_config.txt -y userdefined"
-        print "Running CoMFA : " + dataSet
+        print dataSet + " : Running CoMFA"
+        bashCommand = "./pharmqsar --mode pls -x CoMFA --sdthr " + stdError + " --norm 1 --plscfg CoMFA_config.txt -y userdefined"
         output = subprocess.check_output(['bash','-c', bashCommand])
-        print "-Finishing CoMFA : " + dataSet
         #---------------------------------------------------------------------------
         # MOPAC
         #---------------------------------------------------------------------------
-        print "Running MOPAC H1 : " + dataSet
-        bashCommand = "./pharmqsar --mode pls --sdthr " + stdError + " --norm 1 -x H1 --plscfg plsanal_hyphar.txt -y userdefined --logp userdefined"
+        print dataSet + " : MOPAC H1"
+        bashCommand = "./pharmqsar --mode pls --sdthr " + stdError + " --norm 1 -x H1 --plscfg H1_Config.txt -y userdefined --logp userdefined"
         output = subprocess.check_output(['bash','-c', bashCommand])
-        print "-Finishing H1 : " + dataSet
 
-        print "Running MOPAC H2 : " + dataSet
-        bashCommand = "./pharmqsar --mode pls --sdthr " + stdError + " --norm 1 -x H2 --plscfg plsanal_hyphar.txt -y userdefined --logp userdefined"
+        print dataSet + " : MOPAC H2"
+        bashCommand = "./pharmqsar --mode pls --sdthr " + stdError + " --norm 1 -x H2 --plscfg H2_Config.txt -y userdefined --logp userdefined"
         output = subprocess.check_output(['bash','-c', bashCommand])
-        print "-Finishing H2 : " + dataSet
         #---------------------------------------------------------------------------
         chdir("./..")
 
@@ -87,6 +103,6 @@ def CoMFA(dataSet):
 #-------------------------------------------------------------------------------
 dataSet = sys.argv[1]
 copyFiles(dataSet)
-CoMFA(dataSet)
+QSAR(dataSet)
 
 #

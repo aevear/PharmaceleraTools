@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Merge files into a PharmaScreen ready file
+# Part 5 - Converts mol2 files to our specific file type
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 # Libraries needed
@@ -19,11 +19,26 @@ def checkDataType(sampleFile):
     print "The file that you have provided does not contain either sdf, pdb or mol2"
     return 0
 
-def mol2ToPDB(mol2DataSet):
+
+def mol2ToPDB(mol2DataSet, counter):
     #---------------------------------------------------------------------------
     #---------------------------- Load in Libraries ----------------------------
     #---------------------------------------------------------------------------
     from os import rename, listdir, remove, path, getcwd, remove, chdir, makedirs
+    #---------------------------------------------------------------------------
+    #----------------------- Description of Function ---------------------------
+    #---------------------------------------------------------------------------
+    '''
+    Truthfully, this is a rather intricate part of the program and one I have
+    had no end of errors with. The program constantly gave slightly wrong format
+    that would cause QSAR to fail completely. Real pain let me tell you
+
+    Anyway, if you have to edit this file god help you. Honestly its a mess
+    as I initially had x idea then switched to y when I realized it was better.
+    however I didn't remove the old relics, so you have to sift the old garbage
+    to see what is relevant. I really should clean it up but fuck it it works
+    and I really, really hate this file. Plus god forbid if it errored up again
+    '''
     #---------------------------------------------------------------------------
     #Here we will declare the various parts of the file that we will take and store
     #---------------------------------------------------------------------------
@@ -58,9 +73,7 @@ def mol2ToPDB(mol2DataSet):
         if line.strip() == "@<TRIPOS>MOLECULE": #need to extract the name
             nameTrigger = 1
         elif nameTrigger == 1:
-            name = line.strip() #Removes spaces and stuff
-            name = name.split('.')[0] #cuts off the ending
-            name = name[3:] #cuts off mol part
+            name = str(counter).zfill(3)
             nameTrigger = 0 #Turns off name, only used to get this one bit of data
             outputFileName = "output" + str(name).zfill(3) + "q.pdb"
             output2FileName = "mol" + str(name).zfill(3) + "q.pdb"
@@ -91,11 +104,28 @@ def mol2ToPDB(mol2DataSet):
             logPcav = str(line[11])[:-2]
             logPvW = str(line[12])[:-2]
 
+            #2 is mol, 1 is output
+
+            if (len(atomName) == 1) and (len(number) == 1):
+                formattedAtom1 = " " + number + "  " + atomName + number + " "
+                formattedAtom2 = " " + number + "  " + atomName + "  "
+            elif (len(atomName) == 2) and (len(number) == 1):
+                formattedAtom1 = " " + number + " " + atomName + number + " "
+                formattedAtom2 = " " + number + " " + atomName + "  "
+
+
+            elif (len(atomName) == 1) and (len(number) == 2):
+                formattedAtom1 = number + "  " + atomName + number
+                formattedAtom2 = number + "  " + atomName + "  "
+            elif (len(atomName) == 2) and (len(number) == 2):
+                formattedAtom1 = number + " " + atomName + number
+                formattedAtom2 = number + " " + atomName + "  "
+
             #---------------------------------------------------------------------------
-            # This part we will generate output01q.pdb
+            # This part we will generate output01q.pdb and molq outputs - It's ugly I know
             #---------------------------------------------------------------------------
-            newFileLine = newFileLine + "ATOM" + "{:>7}".format(number)+ "{:>3}".format(atomName) + "   MOL     1      " + "{:>6}".format(xCoordinate) + "{:>8}".format(yCoordinate) + "{:>8}".format(zCoordinate) + "{:>6}".format(logPtot) + "{:>6}".format(logPele) + "{:>6}".format(logPcav) + "{:>6}".format(logPvW) + "\n"
-            newFileLine2 = newFileLine2 + "ATOM" + "{:>7}".format(number)+ "{:>5}".format(atomName + number) + "   MOL     1      " + "{:>6}".format(xCoordinate) + "{:>8}".format(yCoordinate) + "{:>8}".format(zCoordinate) + "  0.00" + "{:>7}".format(gCharges) + "{:>10}".format(atomName) + "\n"
+            newFileLine =   newFileLine + "ATOM     " + formattedAtom2 + " MOL     1      " + "{:>6}".format(xCoordinate) + "{:>8}".format(yCoordinate) + "{:>8}".format(zCoordinate) + "{:>6}".format(logPtot) + "{:>6}".format(logPele) + "{:>6}".format(logPcav) + "{:>6}".format(logPvW) + "\n"
+            newFileLine2 = newFileLine2 + "ATOM     " + formattedAtom1 + " MOL     1      " + "{:>6}".format(xCoordinate) + "{:>8}".format(yCoordinate) + "{:>8}".format(zCoordinate) + "  0.00" + "{:>7}".format(gCharges) + "{:>11}".format(atomName) + "\n"
 
     newFileLine = newFileLine.split("\n")
     newFileLine2 = newFileLine2.split("\n")
@@ -143,11 +173,30 @@ def mol2ToPDB(mol2DataSet):
     #---------------------------------------------------------------------------
     #---------------------------------------------------------------------------
 
+
 def preQsar(dataSet):
     #---------------------------------------------------------------------------
     #---------------------------- Load in Libraries ----------------------------
     #---------------------------------------------------------------------------
     from os import rename, listdir, remove, path, getcwd, remove, chdir, makedirs
+    #---------------------------------------------------------------------------
+    #----------------------- Description of Function ---------------------------
+    #---------------------------------------------------------------------------
+    '''
+    I think this program is rather cleaver (I mean not that cleaver but still).
+    The goal is to break apart the single corrected mol file from the last part
+    of the program and converts it into the right file type.
+
+    We have two types that it converts, mol001q.mol2 and output something idk
+
+    Anyway, this specific function takes the big file, breaks it into single
+    molecules, then feeds the molecules to the mol2toPDB function to create the
+    converted format.
+
+    I might be able to combine this with the previous program as there is quite
+    a bit of overlap, but I already had this one done and didn't want to monkey
+    with it too much tbqh
+    '''
     #---------------------------------------------------------------------------
     #------------------------- Move to old MOL files ---------------------------
     #---------------------------------------------------------------------------
@@ -171,11 +220,13 @@ def preQsar(dataSet):
         originalMolfile[count] = k
         count = count + 1
 
-
+    #---------------------------------------------------------------------------
+    #---------------------- read in two tables ---------------------------------
+    #---------------------------------------------------------------------------
     with open(("activity.txt"), 'r') as f:
         activityFile = f.readlines()
 
-    with open(("CRUZAINconversionTable.txt"), 'r') as f:
+    with open((dataSet + "conversionTable.txt"), 'r') as f:
         converionTable = f.readlines()
 
 
@@ -195,21 +246,23 @@ def preQsar(dataSet):
     #---------------------------------------------------------------------------
     #---------------------- Send to format function ----------------------------
     #---------------------------------------------------------------------------
+    counter = 0
     for k in originalMolfile:
+        counter +=1
         sendFile = "\n".join(k)
         sendFile = "@<TRIPOS>MOLECULE\n" + sendFile
-        mol2ToPDB(sendFile)
+        mol2ToPDB(sendFile, counter)
 
     #---------------------------------------------------------------------------
     #-------------------- Export Activity  -------------------------------------
     #---------------------------------------------------------------------------
     with open(("activity.txt"), 'w') as f:
-        activityFile = activityFile[:-1]
-        f.write(activityFile)
+        for k in activityFile:
+            f.write(k)
 
-    with open(("CRUZAINconversionTable.txt"), 'w') as f:
-        converionTable = converionTable[:-1]
-        f.write(converionTable)
+    with open((dataSet + "conversionTable.txt"), 'w') as f:
+        for k in converionTable:
+            f.write(k)
 
     #---------------------------------------------------------------------------
     #-------------------- Move PharmQSAR here  ---------------------------------
@@ -217,7 +270,6 @@ def preQsar(dataSet):
     chdir("./..")
     from shutil import copy2
     copy2("./../PharmQSARTools/pharmqsar", str("./" + dataSet))
-
 
 
 #-------------------------------------------------------------------------------

@@ -1,15 +1,32 @@
-#testing set renamer 2
-#!/usr/bin/python
-
+#-------------------------------------------------------------------------------
+# Part 1 - Renaming and making activity file
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+# Libraries needed
+#-------------------------------------------------------------------------------
 import sys
-
-
+#-------------------------------------------------------------------------------
+# Function
+#-------------------------------------------------------------------------------
 def renamerScript(dataSet):
-    #-------------------------------------------------------------------------------
-    #------------------------------- Renamer Script --------------------------------
-    #-------------------------------------------------------------------------------
+    #---------------------------------------------------------------------------
+    #----------------------- Description of Function ---------------------------
+    #---------------------------------------------------------------------------
     '''
-    Needs to be fed 3 columns - name, activity, catagory
+    This is the first step of the program! As you might have figure, I wrote
+    each of these code segments seperate from one another and then later cobbled
+    them together, so they in general lack a serious amount of consistency and
+    the later ones are just better written as I have gotten more and more practice
+
+    Anyway, This data set pulls the given data set from the inital folder,
+    0.SourceFiles, and renames them mol001, mol002..... etc. Although this step
+    is really not completely nessesary, it really doesn't take long to run and
+    it provides you with a corrected names for each file (though they are not
+    saved in the damn files so, you have to redue this shit later anyway)
+
+    It also makes the configuration file that is used later which is really
+    the valueable thing here.
+
     '''
     #-------------------------------------------------------------------------------
     #---------------------------- Load in Libraries --------------------------------
@@ -27,7 +44,7 @@ def renamerScript(dataSet):
     #--------------------------- Checks File Paths ---------------------------------
     #-------------------------------------------------------------------------------
     if path.isfile(tableFile) != True:
-        print "Error: Source file is not here"
+        print "Error: Source file is not here in part 1"
         return 0;
 
 
@@ -43,8 +60,6 @@ def renamerScript(dataSet):
     counter = 0
     for k in fnames:
         k = k[:-5]
-        rename(fnames[counter], k.upper() + ".mol2")
-        counter +=1
 
     #-------------------------------------------------------------------------------
     #--------------------------- Extract Mol Folder --------------------------------
@@ -60,9 +75,6 @@ def renamerScript(dataSet):
     file_input = fi.read().split("\n") #reads in files
     file_input = file_input[:-1] #cuts off the end of the list (its empty I hope)
     counter = 0
-    for k in file_input:
-        file_input[counter] = k.upper()
-        counter +=1
     #-------------------------------------------------------------------------------
     #-------------------------- Creates the ACE data sets --------------------------
     #-------------------------------------------------------------------------------
@@ -103,7 +115,8 @@ def renamerScript(dataSet):
             del fileCatagory[count]
             del filePosition[count]
         count +=1
-    print "List of files that are on the list but do not have files for and will be removed : " + str(badList)
+    if not badList:
+        print "List of files that are on the list but do not have files for and will be removed : " + str(badList)
 
     from shutil import copy2
     for idx, k in enumerate(fileName):
@@ -188,12 +201,9 @@ def renamerScript(dataSet):
             counter +=1
 
 
-
 #-------------------------------------------------------------------------------
 #------------------------ Run/test the script ----------------------------------
 #-------------------------------------------------------------------------------
-#dataSet = "ACEdata.txt"
-#dataSet = raw_input("What is the name of the file?: \n-------------------------------------------\n")
 dataSet = sys.argv[1]
 renamerScript(dataSet)
 #-------------------------------------------------------------------------------

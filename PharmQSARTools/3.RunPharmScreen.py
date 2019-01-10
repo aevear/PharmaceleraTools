@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Merge files into a PharmaScreen ready file
+# Part 3 - Runs PharmScreen Bascially
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 # Libraries needed
@@ -13,7 +13,7 @@ def checkDataType(sampleFile):
     if fileEnding == "mol2":
         return "mol2"
     elif fileEnding == ".pdb":
-        return "txt"
+        return "pdb"
     elif fileEnding == ".sdf":
         return "sdf"
     return 0
@@ -25,6 +25,15 @@ def runPharmScreen (dataSet):
     #---------------------------------------------------------------------------
     import subprocess
     from os import rename, listdir, remove, path, getcwd, remove, chdir, makedirs
+    #---------------------------------------------------------------------------
+    #----------------------- Description of Function ---------------------------
+    #---------------------------------------------------------------------------
+    '''
+    Simple, really it just makes a new folder then runs PharmaScreen on it
+
+    Thats it really, not much else to describe, just take a look
+
+    '''
     #---------------------------------------------------------------------------
     #---------------------------- Saying Hello ---------------------------------
     #---------------------------------------------------------------------------
@@ -66,7 +75,7 @@ def runPharmScreen (dataSet):
     #------------------------- Run PharmScreen  --------------------------------
     #---------------------------------------------------------------------------
 
-    bashCommand = "./pharmscreen -i " + str(dataSet) + "." + str(fileEnding) + " -x "+ str(dataSet) + " --single --logp yes -y esp --out mol2"
+    bashCommand = "./pharmscreen -i " + str(dataSet) + ".mol2 -x "+ str(dataSet) + " --single --logp yes -y esp --out mol2"
     print bashCommand
     output = subprocess.check_output(['bash','-c', bashCommand])
 
@@ -74,20 +83,6 @@ def runPharmScreen (dataSet):
     print "------------------------------"
     print "Finished PharmaScreen for : " + dataSet + "!"
     print "------------------------------"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 #-------------------------------------------------------------------------------

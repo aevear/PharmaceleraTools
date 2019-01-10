@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Merge files into a PharmaScreen ready file
+# Part 2 - Merge files into a PharmaScreen ready file
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 # Libraries needed
@@ -9,6 +9,10 @@ import sys
 # Function
 #-------------------------------------------------------------------------------
 def checkDataType(sampleFile):
+    '''
+    This used to be quite useful, but then it turns out the only file type
+    accepted is mol2, so now its irrelevant. :(
+    '''
     fileEnding = sampleFile[-4:]
     if fileEnding == "mol2":
         return "mol2"
@@ -16,7 +20,6 @@ def checkDataType(sampleFile):
         return "pdb"
     elif fileEnding == ".sdf":
         return "sdf"
-    print "The file that you have provided does not contain either sdf, pdb or mol2"
     return 0
 
 
@@ -26,11 +29,23 @@ def mergeFiles (dataSet):
     #---------------------------------------------------------------------------
     import subprocess
     from os import rename, listdir, remove, path, getcwd, remove, chdir, makedirs
+    #---------------------------------------------------------------------------
+    #----------------------- Description of Function ---------------------------
+    #---------------------------------------------------------------------------
+    '''
+    This set is also a bit self explanatory. It combines all of the data sets
+    into a single functional mol2 file.
 
+    I had been using pymol to do this but it turns out it sucks ass and renamed
+    quite a few files (doesn't like Cl).
 
+    Anyway, I had to write this to combine them fo realz.
+
+    '''
     #---------------------------------------------------------------------------
     #------------------------- Move to old MOL files ---------------------------
     #---------------------------------------------------------------------------
+
     newDirectory = "./../1.RenamedFiles/" + dataSet
     chdir(newDirectory)
 
